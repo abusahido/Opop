@@ -1,0 +1,725 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Global Chat Video Call - Enhanced Design</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #1a1a2e, #16213e, #0f3460);
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .container {
+            position: relative;
+            z-index: 10;
+            text-align: center;
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+        
+        .title {
+            font-size: 2.5rem;
+            margin-bottom: 30px;
+            color: white;
+            text-shadow: 0 0 15px rgba(67, 97, 238, 0.7);
+        }
+        
+        .title span {
+            background: linear-gradient(45deg, #4cc9f0, #4361ee);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            font-weight: 700;
+        }
+        
+        .cards-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 30px;
+            margin-top: 40px;
+        }
+        
+        .chat-card {
+            position: relative;
+            width: 380px;
+            height: 420px;
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(15px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            z-index: 1;
+            transform-style: preserve-3d;
+            transition: all 0.4s ease;
+            cursor: pointer;
+        }
+        
+        .card-1 {
+            transform: translateY(20px);
+        }
+        
+        .card-2 {
+            transform: translateY(0);
+        }
+        
+        .chat-card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.7);
+        }
+        
+        /* Background image container */
+        .background-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-size: cover;
+            background-position: center;
+            border-radius: 20px;
+            z-index: -2;
+            opacity: 0.8;
+        }
+        
+        .card-1 .background-image {
+            background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+        }
+        
+        .card-2 .background-image {
+            background-image: url('https://images.unsplash.com/photo-1589652717521-10c0d092dea9?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1170&q=80');
+        }
+        
+        .chat-card::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: conic-gradient(
+                transparent, 
+                rgba(168, 239, 255, 0.1), 
+                transparent 30%
+            );
+            animation: rotate 6s linear infinite;
+            z-index: -1;
+        }
+        
+        .chat-card::after {
+            content: '';
+            position: absolute;
+            inset: 2px;
+            background: linear-gradient(145deg, rgba(15, 23, 42, 0.8), rgba(30, 41, 59, 0.9));
+            border-radius: 18px;
+            z-index: -1;
+        }
+        
+        .card-header {
+            text-align: center;
+            margin-bottom: 25px;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .card-icon {
+            display: inline-block;
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+            animation: pulse 3s infinite;
+        }
+        
+        .card-1 .card-icon {
+            background: linear-gradient(135deg, #4361ee, #3a0ca3);
+        }
+        
+        .card-2 .card-icon {
+            background: linear-gradient(135deg, #f9a826, #ff5722);
+        }
+        
+        .card-icon i {
+            font-size: 40px;
+            color: white;
+        }
+        
+        .card-title {
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+        
+        .card-subtitle {
+            font-size: 1.1rem;
+            color: #94a3b8;
+            font-weight: 300;
+        }
+        
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0 25px;
+        }
+        
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            background: #10b981;
+            border-radius: 50%;
+            margin-right: 10px;
+            box-shadow: 0 0 10px #10b981;
+            animation: blink 1.5s infinite;
+        }
+        
+        .status-text {
+            color: #94a3b8;
+            font-size: 1rem;
+        }
+        
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            background: rgba(15, 23, 42, 0.7);
+            padding: 15px;
+            border-radius: 15px;
+            margin-bottom: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            position: relative;
+            z-index: 2;
+        }
+        
+        .stat-item {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .stat-number {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: white;
+        }
+        
+        .card-1 .stat-number {
+            color: #4361ee;
+        }
+        
+        .card-2 .stat-number {
+            color: #f9a826;
+        }
+        
+        .stat-label {
+            font-size: 0.9rem;
+            color: #94a3b8;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .cta-section {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .cta-button {
+            display: inline-block;
+            padding: 14px 35px;
+            color: white;
+            font-size: 1.1rem;
+            font-weight: 600;
+            text-decoration: none;
+            border-radius: 50px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            border: none;
+            cursor: pointer;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-1 .cta-button {
+            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+            box-shadow: 0 8px 20px rgba(67, 97, 238, 0.4);
+        }
+        
+        .card-2 .cta-button {
+            background: linear-gradient(45deg, #f9a826, #ff5722);
+            box-shadow: 0 8px 20px rgba(249, 168, 38, 0.4);
+        }
+        
+        .cta-button:hover {
+            transform: translateY(-3px);
+        }
+        
+        .cta-button:active {
+            transform: translateY(0);
+        }
+        
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+        
+        .cta-button:hover::before {
+            left: 100%;
+        }
+        
+        .chat-bubbles {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .bubble {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(67, 97, 238, 0.1);
+            animation: float 15s infinite linear;
+        }
+        
+        .bubble:nth-child(1) {
+            width: 40px;
+            height: 40px;
+            top: 20%;
+            left: 10%;
+            animation-duration: 20s;
+        }
+        
+        .bubble:nth-child(2) {
+            width: 25px;
+            height: 25px;
+            top: 60%;
+            left: 80%;
+            animation-duration: 15s;
+            animation-delay: 2s;
+        }
+        
+        .bubble:nth-child(3) {
+            width: 30px;
+            height: 30px;
+            top: 40%;
+            left: 70%;
+            animation-duration: 18s;
+            animation-delay: 1s;
+        }
+        
+        .bubble:nth-child(4) {
+            width: 20px;
+            height: 20px;
+            top: 75%;
+            left: 20%;
+            animation-duration: 12s;
+            animation-delay: 3s;
+        }
+        
+        .instructions {
+            margin-top: 40px;
+            color: #94a3b8;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.5);
+            border-radius: 15px;
+            max-width: 600px;
+            margin: 40px auto 0;
+            position: relative;
+            z-index: 10;
+        }
+        
+        .instructions h3 {
+            color: #4cc9f0;
+            margin-bottom: 15px;
+        }
+        
+        .instructions p {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+        
+        .highlight {
+            color: #f72585;
+            font-weight: 600;
+        }
+        
+        /* Animations */
+        @keyframes rotate {
+            from {
+                transform: rotate(0deg);
+            }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0.7);
+            }
+            70% {
+                transform: scale(1.05);
+                box-shadow: 0 0 0 10px rgba(67, 97, 238, 0);
+            }
+            100% {
+                transform: scale(1);
+                box-shadow: 0 0 0 0 rgba(67, 97, 238, 0);
+            }
+        }
+        
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+            }
+            100% {
+                transform: translateY(-100px) translateX(50px) rotate(360deg);
+            }
+        }
+        
+        /* Background elements */
+        .bg-elements {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        .bg-element {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+        }
+        
+        .bg-element:nth-child(1) {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(45deg, #4361ee, #3a0ca3);
+            top: -150px;
+            right: -150px;
+        }
+        
+        .bg-element:nth-child(2) {
+            width: 200px;
+            height: 200px;
+            background: linear-gradient(45deg, #f72585, #7209b7);
+            bottom: -100px;
+            left: -100px;
+        }
+        
+        .bg-element:nth-child(3) {
+            width: 150px;
+            height: 150px;
+            background: linear-gradient(45deg, #4cc9f0, #4895ef);
+            top: 40%;
+            left: 10%;
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 1200px) {
+            .cards-container {
+                flex-wrap: wrap;
+            }
+            
+            .chat-card {
+                width: 350px;
+                height: 400px;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .title {
+                font-size: 2rem;
+            }
+            
+            .chat-card {
+                width: 100%;
+                max-width: 400px;
+                height: 380px;
+            }
+            
+            .card-title {
+                font-size: 1.8rem;
+            }
+        }
+        
+        @media (max-width: 480px) {
+            .title {
+                font-size: 1.6rem;
+            }
+            
+            .chat-card {
+                height: 360px;
+                padding: 20px;
+            }
+            
+            .card-title {
+                font-size: 1.6rem;
+            }
+            
+            .stat-number {
+                font-size: 1.5rem;
+            }
+            
+            .cta-button {
+                padding: 12px 30px;
+                font-size: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="bg-elements">
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+        <div class="bg-element"></div>
+    </div>
+    
+    <div class="container">
+        <h1 class="title">Global <span>Video Chat</span> Experience</h1>
+        
+        <div class="cards-container">
+            <div class="chat-card card-1">
+                <div class="background-image"></div>
+                <div class="chat-bubbles">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+                
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-globe-americas"></i>
+                    </div>
+                    <h1 class="card-title">Global Video Chat</h1>
+                    <p class="card-subtitle">Connect with the world instantly</p>
+                    
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <div class="status-text">Live: 5,238 users online</div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">5M+</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-number">190+</div>
+                        <div class="stat-label">Countries</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-number">50+</div>
+                        <div class="stat-label">Languages</div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <button class="cta-button">
+                        <i class="fas fa-video"></i> Start Video Call
+                    </button>
+                </div>
+            </div>
+            
+            <div class="chat-card card-2">
+                <div class="background-image"></div>
+                <div class="chat-bubbles">
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                    <div class="bubble"></div>
+                </div>
+                
+                <div class="card-header">
+                    <div class="card-icon">
+                        <i class="fas fa-comments"></i>
+                    </div>
+                    <h1 class="card-title">Chat Avenue</h1>
+                    <p class="card-subtitle">Join the conversation now</p>
+                    
+                    <div class="status-indicator">
+                        <div class="status-dot"></div>
+                        <div class="status-text">Live: 6,842 users online</div>
+                    </div>
+                </div>
+                
+                <div class="stats">
+                    <div class="stat-item">
+                        <div class="stat-number">4.5M+</div>
+                        <div class="stat-label">Users</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-number">150+</div>
+                        <div class="stat-label">Rooms</div>
+                    </div>
+                    
+                    <div class="stat-item">
+                        <div class="stat-number">24/7</div>
+                        <div class="stat-label">Active</div>
+                    </div>
+                </div>
+                
+                <div class="cta-section">
+                    <button class="cta-button">
+                        <i class="fas fa-comment-dots"></i> Join Chat
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="instructions">
+            <h3>How to use:</h3>
+            <p>Click on the <span class="highlight">first card (Global Video Chat)</span> to be redirected directly to the video chat platform.</p>
+            <p>Click on the <span class="highlight">second card (Chat Avenue)</span> to join the text chat platform.</p>
+            <p>No frames or intermediate pages - you'll go straight to the destination!</p>
+        </div>
+    </div>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.chat-card');
+            
+            // Add click event to cards for direct redirect
+            cards[0].addEventListener('click', function(event) {
+                createRippleEffect(this, event);
+                setTimeout(() => {
+                    window.location.href = 'https://y99.in/web/mobile2/direct';
+                }, 500);
+            });
+            
+            cards[1].addEventListener('click', function(event) {
+                createRippleEffect(this, event);
+                setTimeout(() => {
+                    window.location.href = 'https://www.chat-avenue.com/';
+                }, 500);
+            });
+            
+            function createRippleEffect(card, event) {
+                // Create ripple effect
+                card.style.position = 'relative';
+                card.style.overflow = 'hidden';
+                
+                const ripple = document.createElement('div');
+                ripple.style.position = 'absolute';
+                ripple.style.borderRadius = '50%';
+                ripple.style.transform = 'scale(0)';
+                ripple.style.animation = 'ripple 0.6s linear';
+                ripple.style.background = 'rgba(255, 255, 255, 0.4)';
+                ripple.style.width = '100px';
+                ripple.style.height = '100px';
+                ripple.style.top = (event.offsetY - 50) + 'px';
+                ripple.style.left = (event.offsetX - 50) + 'px';
+                ripple.style.pointerEvents = 'none';
+                card.appendChild(ripple);
+                
+                // Add CSS for ripple animation if not already added
+                if (!document.getElementById('ripple-style')) {
+                    const style = document.createElement('style');
+                    style.id = 'ripple-style';
+                    style.innerHTML = `
+                        @keyframes ripple {
+                            to {
+                                transform: scale(4);
+                                opacity: 0;
+                            }
+                        }
+                    `;
+                    document.head.appendChild(style);
+                }
+            }
+            
+            // Interactive card tilt effect
+            cards.forEach(card => {
+                // Mouse move effect for 3D tilt
+                card.addEventListener('mousemove', (e) => {
+                    const xAxis = (card.offsetWidth / 2 - e.offsetX) / 25;
+                    const yAxis = (card.offsetHeight / 2 - e.offsetY) / 25;
+                    card.style.transform = `rotateY(${xAxis}deg) rotateX(${yAxis}deg)`;
+                });
+                
+                // Mouse enter effect
+                card.addEventListener('mouseenter', () => {
+                    card.style.transition = 'none';
+                });
+                
+                // Mouse leave effect
+                card.addEventListener('mouseleave', () => {
+                    card.style.transition = 'all 0.4s ease';
+                    card.style.transform = `rotateY(0deg) rotateX(0deg)`;
+                });
+            });
+            
+            // Button ripple effect
+            const buttons = document.querySelectorAll('.cta-button');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    
+                    let x = e.clientX - e.target.getBoundingClientRect().left;
+                    let y = e.clientY - e.target.getBoundingClientRect().top;
+                    
+                    let ripples = document.createElement('span');
+                    ripples.style.left = x + 'px';
+                    ripples.style.top = y + 'px';
+                    ripples.style.position = 'absolute';
+                    ripples.style.borderRadius = '50%';
+                    ripples.style.transform = 'translate(-50%, -50%)';
+                    ripples.style.width = '5px';
+                    ripples.style.height = '5px';
+                    ripples.style.background = 'rgba(255, 255, 255, 0.4)';
+                    ripples.style.animation = 'ripple 1s linear';
+                    this.appendChild(ripples);
+                    
+                    setTimeout(() => {
+                        ripples.remove();
+                    }, 1000);
+                });
+            });
+        });
+    </script>
+</body>
+</html>
